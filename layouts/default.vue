@@ -2,7 +2,7 @@
   <div>
     <b-navbar toggleable="md" type="dark" variant="info">
       <b-nav-toggle target="nav_collapse"></b-nav-toggle>
-      <b-navbar-brand href="/">Ribans</b-navbar-brand>
+      <b-navbar-brand href="/">Ankimo</b-navbar-brand>
       <b-collapse is-nav id="nav_collapse">
         <b-nav is-nav-bar>
           <b-nav-item href="/english_apps/learn">記憶</b-nav-item>

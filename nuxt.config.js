@@ -7,7 +7,7 @@ module.exports = {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000'
   }
   head: {
-    title: 'word_app',
+    title: 'ankimo',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
