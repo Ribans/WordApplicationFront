@@ -9,6 +9,22 @@
           <b-nav-item href="/english_apps/challenge">挑戦</b-nav-item>
           <b-nav-item href="/english_apps/training">練習</b-nav-item>
         </b-nav>
+
+        <b-nav is-nav-bar class="ml-auto">
+          <b-nav-item-dropdown right>
+            <template slot="button-content">
+              <em>User</em>
+            </template>
+            <div v-if="userLogined">
+              <b-dropdown-item href="#">Profile</b-dropdown-item>
+              <b-dropdown-item href="#">Signout</b-dropdown-item>
+            </div>
+            <div v-else>
+              <b-dropdown-item href="#">Signin</b-dropdown-item>
+              <b-dropdown-item href="#">Signup</b-dropdown-item>
+            </div>
+          </b-nav-item-dropdown>
+        </b-nav>
       </b-collapse>
     </b-navbar>
     <main>
@@ -16,3 +32,13 @@
     </main>
   </div>
 </template>
+
+<script>
+export default {
+  data: function() {
+    return {
+      userLogined: false,
+    }
+  }
+}
+</script>
