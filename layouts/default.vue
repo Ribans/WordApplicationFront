@@ -12,16 +12,14 @@
 
         <b-nav is-nav-bar class="ml-auto">
           <b-nav-item-dropdown right>
-            <template slot="button-content">
-              <em>User</em>
-            </template>
+            <template slot="button-content"> <strong>User</strong> </template>
             <div v-if="userLogined">
-              <b-dropdown-item href="#">Profile</b-dropdown-item>
+              <b-dropdown-item href="/users/profile">Profile</b-dropdown-item>
               <b-dropdown-item href="#">Signout</b-dropdown-item>
             </div>
             <div v-else>
-              <b-dropdown-item href="#">Signin</b-dropdown-item>
-              <b-dropdown-item href="#">Signup</b-dropdown-item>
+              <b-dropdown-item href="/users/signin">Signin</b-dropdown-item>
+              <b-dropdown-item href="/users/signup">Signup</b-dropdown-item>
             </div>
           </b-nav-item-dropdown>
         </b-nav>
