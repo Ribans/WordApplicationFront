@@ -11,7 +11,8 @@
 		}
 	},
 	"scripts": {
-		"dev": "nuxt",
+		"dev": "node API/server.js",
+		"nuxt": "nuxt",
 		"build": "nuxt build",
 		"start": "cross-env NODE_ENV=production node API/server.js",
 		"generate": "nuxt generate",

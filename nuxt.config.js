@@ -1,13 +1,13 @@
 module.exports = {
   cache: true,
+  titleTemplate: '%s - Ankimo',
   modules: [
     '@nuxtjs/bootstrap-vue',
   ],
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000'
-  }
+  },
   head: {
-    title: 'ankimo',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },

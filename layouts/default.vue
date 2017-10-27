@@ -13,7 +13,7 @@
         <b-nav is-nav-bar class="ml-auto">
           <b-nav-item-dropdown right>
             <template slot="button-content"> <strong>User</strong> </template>
-            <div v-if="userLogined">
+            <div v-if="$store.state.authUser">
               <b-dropdown-item href="/users/profile">Profile</b-dropdown-item>
               <b-dropdown-item href="#">Signout</b-dropdown-item>
             </div>
