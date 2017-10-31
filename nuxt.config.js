@@ -20,6 +20,7 @@ module.exports = {
   css: [
     '~/assets/css/base.css',
     '~/assets/css/learn.css',
+    '~/assets/css/index.css',
   ],
   loading: { color: '#3B8070' },
 }

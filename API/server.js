@@ -29,7 +29,7 @@ express.post('/api/login', function(req, res){
   // if (req.body.username === 'demo' && req.body.password === 'demo') {}
   req.session.crrentUser = { username: req.body.username };
   return res.json({ username: req.body.username });
-  res.status(401).json({ error: 'Bad credentials' })
+  // res.status(401).json({ error: 'Bad credentials' })
   console.log(req.body)
 });
 

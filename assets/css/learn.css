@@ -1,3 +1,13 @@
 .btn {
   margin: 0.5em;
 }
+
+.exam {
+  background: #eee;
+  padding: 20px;
+  border-radius:10px;
+}
+
+/* div{ */
+/*   margin: 1em; */
+/* } */

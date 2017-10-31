@@ -41,6 +41,7 @@ export default {
           username: this.username,
           password: this.password
         });
+        console.log("signin");
         this.username = '';
         this.password = '';
         this.formError = null;

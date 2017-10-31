@@ -2,8 +2,6 @@
   <div>
     <h2>チャレンジパート</h2>
 
-    <p>100問覚えた人のみに許されたもーど</p>
-
     <select id="select-lang" name="lang" class="btn" v-model="selectedLang">
       <option value="japanese">日本語</option>
       <option value="english">英語</option>
@@ -18,7 +16,10 @@
     </div>
 
     <div class="exam">
-      <span class="judge">{{ result }}</span>
+      <span class="judge">
+        {{ result }}
+      </span>
+      <br>
       <strong><span id="count" >残り問題数: {{ 11 - wave }} </span></strong><br>
       <h3 class="exam_title">{{exams[questionLang]}}</h3><br>
       <button class="btn" v-for=" data in exams.dummies" v-on:click="judgeing(data[answerLang])">{{ data[answerLang] }}</button>
@@ -72,7 +73,7 @@ export default {
     },
     getExam: function() {
       var vm = this;
-      axios.get(`/api/v1/exam/challenge`).then(function(res){
+      axios.get(`/challenge`).then(function(res){
         vm.exams = res.data
       });
     },
