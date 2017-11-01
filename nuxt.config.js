@@ -1,13 +1,13 @@
 module.exports = {
   cache: true,
+  titleTemplate: '%s - Ankimo',
   modules: [
     '@nuxtjs/bootstrap-vue',
   ],
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000'
-  }
+  },
   head: {
-    title: 'word_app',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -20,6 +20,7 @@ module.exports = {
   css: [
     '~/assets/css/base.css',
     '~/assets/css/learn.css',
+    '~/assets/css/index.css',
   ],
   loading: { color: '#3B8070' },
 }

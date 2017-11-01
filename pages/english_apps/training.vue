@@ -55,7 +55,7 @@ export default {
     },
     getExam: function() {
       var vm = this;
-      axios.get(`/api/v1/exam/challenge`).then(function(res){
+      axios.get(`/training`).then(function(res){
         vm.exams = res.data
       });
     },

@@ -10,8 +10,10 @@
     <div class="progress">
       <div class="progress-bar progress-bar-danger progress-bar-striped" id="count_down"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="progressRate"> </div>
     </div>
+    <br>
 
     <div class="exam" v-if="exam">
+      <h1 v-if="message">{{message}}</h1>
       <table width="100%">
         <tr v-if="resultView"><th>問題</th><th>答え</th><th>結果</th><th>入力</th></tr>
         <tr v-for="exam in exams"> 
@@ -28,8 +30,10 @@
       </table>
       <!-- <b&#45;table striped :items="exams"></b&#45;table> -->
       <br>
-      <button v-on:click="nextStage" v-if= "nextStageButton" class="btn">次へ(round)</button>
-      <button v-on:click="jumpToResult" v-if= "jumpToResultButton" class="btn">次へ(result)</button>
+      <button v-on:click="redo" v-if= "redoButton" class="btn btn-success">覚え直す</button>
+      <button v-on:click="nextStage" v-if= "nextStageButton" class="btn btn-warning">次の5問に進む</button>
+      <button v-on:click="jumpToResult" v-if= "jumpToResultButton" class="btn">回答をチェック</button>
+      <button v-on:click="jumpToChackStage" v-if= "jumpToChackStagekButton" class="btn">チェックテストへ進む</button>
     </div>
     <div class="result">
     </div>
@@ -48,8 +52,12 @@ export default {
       inputForm: true,
       startButton: false,
       nextButton: false,
+      redoButton: false,
+      jumpToResultButton: false,
+      jumpToChackStagekButton: false,
       exam: false,
       resultView: false,
+      message: "",
       progressRate: {width: "100%"},
       wave: 0,
     }
@@ -60,6 +68,7 @@ export default {
       this.inputForm = true;
       this.startButton = false;
       this.nextStageButton = false;
+      this.redoButton = false,
       this.jumpToResultButton = false;
       this.exam = false;
       this.resultView = false;
@@ -67,7 +76,7 @@ export default {
     },
     getExam: function() {
       var self = this
-        axios.get(`/api/v1/exam/learn`).then(function (response) {
+        axios.get(`/learn`).then(function (response) {
           self.exams = response.data
         }).catch(function (error) {
           console.log(error);
@@ -98,7 +107,7 @@ export default {
     progress: function() {
       var self = this;
       var timer
-      var par = 100
+      var par = 20
         var promise = new Promise(function(resolve, reject){
           timer = window.setInterval(function(){
             var rate = (par -= 2);
@@ -113,6 +122,7 @@ export default {
           self.exams = self.arrayShuffle(self.exams);
           self.inputForm = false;
           self.jumpToResultButton = true;
+          self.redoButton = true;
         })
     },
     result: function(){
@@ -148,12 +158,14 @@ export default {
         if (!(self.wave >= 1)){ //ゲームを終了させるか
           self.initialization();
           self.wave++;
+          self.message = "Exellent!!";
           self.exam = true;
           self.getExam();
           self.progress();
         } else {
           self.nextButton = false;
-          self.jumpToResultButton = false;
+          self.message = "Congratulations!!"
+            self.jumpToResultButton = false;
           alert("終了！");
           self.initialization();
         }
@@ -163,14 +175,26 @@ export default {
         self.inputForm = false;
       }
     },
+    redo: function() {
+      var self = this;
+      self.progress();
+      this.inputForm = true;
+      this.startButton = false;
+      this.nextStageButton = false;
+      this.redoButton = false,
+      this.jumpToResultButton = false;
+      this.resultView = false;
+      this.progressRate = {width: "100%"};
+      self.exam = true;
+    },
     start: function(){
       var self = this;
+      self.progress();
       self.initialization();
       self.wave = 0;
       self.startButton = true;
       self.exam = true;
       self.getExam();
-      self.progress();
     }
   }
 }

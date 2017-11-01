@@ -1,8 +1,8 @@
 {
-	"name": "word_app",
+	"name": "Ankimo",
 	"version": "1.0.0",
 	"description": "Ribans Project",
-	"author": "a",
+	"author": "aznalo",
 	"private": true,
 	"config": {
 		"nuxt": {
@@ -11,9 +11,10 @@
 		}
 	},
 	"scripts": {
-		"dev": "nuxt",
+		"dev": "node API/server.js",
+		"nuxt": "nuxt",
 		"build": "nuxt build",
-		"start": "nuxt start",
+		"start": "cross-env NODE_ENV=production node API/server.js",
 		"generate": "nuxt generate",
 		"lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
 		"precommit": "npm run lint"
@@ -21,10 +22,15 @@
 	"dependencies": {
 		"@nuxtjs/bootstrap-vue": "^2.0.2",
 		"axios": "^0.17.0",
-		"nuxt": "^1.0.0-rc11"
+		"body-parser": "^1.18.2",
+		"express": "^4.16.2",
+		"express-session": "^1.15.6",
+		"nuxt": "^1.0.0-rc11",
+		"whatwg-fetch": "^2.0.3"
 	},
 	"devDependencies": {
 		"babel-eslint": "^7.2.3",
+		"cross-env": "^5.1.0",
 		"eslint": "^4.3.0",
 		"eslint-config-standard": "^10.2.1",
 		"eslint-loader": "^1.9.0",
