@@ -23,17 +23,17 @@
     <div class="input" v-if="inputWindow">
       <h2>input</h2>
       <div v-for="exam in exams">
-        {{exam.english}} : <input type="text" class="form-control">
+        {{exam.english}} : <input type="text" v-model="exam.input" class="form-control">
       </div>
       <br>
-      <button v-on:click="redo(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
-      <button v-on:click="next(nextAction)" v-if= "nextText" class="btn btn-warning">{{ nextText }}</button>
+      <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
+      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning">{{ nextText }}</button>
     </div>
 
     <div class="result" v-if="resultWindow">
       <h2>result</h2>
-      <button v-on:click="redo(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
-      <button v-on:click="next(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction==='4' ">{{ nextText }}</button>
+      <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
+      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction==='4' ">{{ nextText }}</button>
     </div>
 
   </div>
@@ -56,36 +56,34 @@ export default {
   },
   methods: {
     start () { //startButton on click program
-      var vm = this;
-      vm.wave += 1;
-      new Promise(function(resolve, reject){
-        vm.getExam(function(exam) {
+      let vm = this;
+      vm.wave++;
+      new Promise((resolve, reject) => {
+        vm.getExam(exam => {
           resolve(exam);
         });
-      }).then(function(exam){
+      }).then(exam => {
         vm.originExams = exam;
         vm.switchWindowSetup(exam, "exam");
-        vm.countDown(10, function(){
+        vm.countDown(10, () => {
           vm.switchWindowSetup(exam, "input");
         });
       });
     },
-    redo (switchCase) {
+    button (switchCase) {
+      let vm = this;
       switch (switchCase) {
-        case "1":
-          console.log(switchCase);
-          break;
-        case "4":
-          console.log(switchCase);
-          break;
-      }
-    },
-    next (switchCase) {
-      switch (switchCase) {
-        case "2":
+        case "1": //覚え直す
+          vm.switchWindowSetup(vm.originExams, "exam")
           console.log(switchCase);
           break
-        case "3":
+        case "2": //採点
+          console.log(switchCase);
+          break
+        case "3": // 次の問題
+          console.log(switchCase);
+          break;
+        case "4": //やり直す
           console.log(switchCase);
           break;
       }
@@ -93,67 +91,67 @@ export default {
     init () {
     },
     switchWindowSetup (exam, switchCase) {
-      var vm = this;
+      let vm = this;
       switch (switchCase) {
         case "exam":
-          console.log("exam");
-          vm.examWindow = true; vm.inputWindow = false; vm.resultWindow = false;
           vm.examWindowSetup(exam);
           break;
         case "input":
-          vm.examWindow = false; vm.inputWindow = true; vm.resultWindow = false;
-          vm.redoAction = "1"; vm.nextAction = "2"
           vm.inputWindowSetup(exam);
           break;
         case "result":
-          vm.examWindow = false; vm.inputWindow = false; vm.resultWindow = true;
-          if (!exam.mistake) {
-            vm.redoAction = "1"; vm.nextAction = "3"
-          } else {
-            vm.redoAction = "4"; vm.nextAction = "3"
-          }
           vm.resultWindowSetup(exam);
           break
       }
     },
     examWindowSetup (exams) {
-      var vm = this;
+      let vm = this;
+      vm.examWindow = true; vm.inputWindow = false; vm.resultWindow = false;
       vm.exams = exams;
     },
     inputWindowSetup (exams) {
-      var vm = this;
+      let vm = this;
       vm.exams = vm.arrayShuffle(exams);
+      vm.examWindow = false; vm.inputWindow = true; vm.resultWindow = false;
+      vm.redoAction = "1"; vm.nextAction = "2"
       vm.redoText = "覚え直す";
       vm.nextText = "採点";
     },
     resultWindowSetup () {
+      let vim = this;
+      vm.examWindow = false; vm.inputWindow = false; vm.resultWindow = true;
+      if (!exam.mistake) {
+        vm.redoAction = "1"; vm.nextAction = "3"
+      } else {
+        vm.redoAction = "4"; vm.nextAction = "3"
+      }
     },
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ private
-    getExam: function(ret) {
-      var self = this
-        axios.get(`/learn`).then(function (response) {
+    getExam (ret) {
+      let self = this
+        axios.get(`/learn`).then( response => {
           console.log("getExam");
           console.log(response.data);
           ret(response.data)
           // return response.data
-        }).catch(function (error) {
+        }).catch( error => {
           console.log(error);
         });
     },
-    arrayShuffle: function(array){
-      for(var i = array.length - 1; i > 0; i--){
-        var r = Math.floor(Math.random() * (i + 1));
-        var tmp = array[i];
+    arrayShuffle (array) {
+      for(let i = array.length - 1; i > 0; i--){
+        let r = Math.floor(Math.random() * (i + 1));
+        let tmp = array[i];
         array[i] = array[r];
         array[r] = tmp;
       }
       return array
     },
-    mistake: function() {
-      var self = this;
-      var exams = self.exams;
-      var ary = [];
-      for( var i = 0; i < exams.length; i++ ){
+    mistake () {
+      let self = this;
+      let exams = self.exams;
+      let ary = [];
+      for( let i = 0; i < exams.length; i++ ) {
         if (!(exams[i].resultB)) {
           exams[i].result = null;
           exams[i].input =  null;
@@ -162,11 +160,11 @@ export default {
       };
       return ary;
     },
-    countDown: function(par, ret) {
-      var self = this;
-      var timer;
-      var promise = new Promise(function(resolve, reject){
-        timer = window.setInterval(function(){
+    countDown (par, ret) {
+      let self = this;
+      let timer;
+      const promise = new Promise((resolve, reject) => {
+        timer = window.setInterval(() => {
           var rate = (par -= 2);
           self.remainingTimeValue = {width: (rate + '%')};
           if (rate <= 0){
@@ -174,10 +172,10 @@ export default {
           };
         },1000);
       })
-      promise.then(function(){
+      promise.then(() => {
         clearInterval(timer);
         ret(); // return
-      }).catch(function(e) {
+      }).catch( e => {
         alert("Error:" + e)
       })
     },
