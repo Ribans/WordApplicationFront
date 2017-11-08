@@ -102,7 +102,8 @@ export default {
     },
     resultWindowSetup () {
       this.examWindow = false; this.inputWindow = false; this.resultWindow = true;
-      const exams = this.scoring()
+      console.log(this.exams);
+      const exams = this.scoring(this.exams);
       let miss = exams.find( value => {
         if ( value.result === "不正解" ) { return true };
       });
@@ -129,19 +130,18 @@ export default {
       }
       return array
     },
-    scoring () {
+    scoring (exams) {
       console.log("scoring")
-      for( let i = 0; i < this.exams.length; i++ ) {
-        if (this.exams[i].input === this.exams[i].japanese) {
-          this.exams[i].result = "正解";
-          this.exams[i].done = true;
+      for( let i = 0; i < exams.length; i++ ) {
+        if (exams[i].input === exams[i].japanese) {
+          exams[i].result = "正解";
+          exams[i].done = true;
         } else {
-          this.exams[i].result = "不正解";
-          this.exams[i].done = false;
+          exams[i].result = "不正解";
+          exams[i].done = false;
         };
       };
-      console.log(this.exams);
-      return this.exams;
+      return exams;
     },
     countDown (par, ret) {
       let timer;
