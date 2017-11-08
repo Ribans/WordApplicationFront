@@ -10,6 +10,7 @@
     <div class="progress">
       <div class="progress-bar progress-bar-danger progress-bar-striped" id="count_down"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="remainingTimeValue"> </div>
     </div>
+      残り: {{ remainingTimeValue.width }}
     <br>
 
     <div class="exam" v-if="examWindow">
@@ -32,8 +33,9 @@
 
     <div class="result" v-if="resultWindow">
       <h2>result</h2>
+      <b-table striped hover :items="exams"></b-table>
       <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
-      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction==='4' ">{{ nextText }}</button>
+      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction === '4' ">{{ nextText }}</button>
     </div>
 
   </div>
@@ -56,117 +58,97 @@ export default {
   },
   methods: {
     start () { //startButton on click program
-      let vm = this;
-      vm.wave++;
+      this.wave++;
       new Promise((resolve, reject) => {
-        vm.getExam(exam => {
+        this.getExam( exam => {
           resolve(exam);
         });
       }).then(exam => {
-        vm.originExams = exam;
-        vm.switchWindowSetup(exam, "exam");
-        vm.countDown(10, () => {
-          vm.switchWindowSetup(exam, "input");
+        this.originExams = exam;
+          this.examWindowSetup(exam);
+        this.countDown(10, () => {
+          this.inputWindowSetup();
         });
       });
     },
     button (switchCase) {
-      let vm = this;
       switch (switchCase) {
         case "1": //覚え直す
-          vm.switchWindowSetup(vm.originExams, "exam")
-          console.log(switchCase);
-          break
+        this.examWindowSetup(this.originExams);
+        break
         case "2": //採点
-          console.log(switchCase);
-          break
+        this.resultWindowSetup(this.originExams);
+        break
         case "3": // 次の問題
-          console.log(switchCase);
-          break;
+        console.log(switchCase);
+        break;
         case "4": //やり直す
-          console.log(switchCase);
-          break;
+        console.log(switchCase);
+        break;
       }
     },
     init () {
     },
-    switchWindowSetup (exam, switchCase) {
-      let vm = this;
-      switch (switchCase) {
-        case "exam":
-          vm.examWindowSetup(exam);
-          break;
-        case "input":
-          vm.inputWindowSetup(exam);
-          break;
-        case "result":
-          vm.resultWindowSetup(exam);
-          break
-      }
-    },
     examWindowSetup (exams) {
-      let vm = this;
-      vm.examWindow = true; vm.inputWindow = false; vm.resultWindow = false;
-      vm.exams = exams;
+      this.examWindow = true; this.inputWindow = false; this.resultWindow = false;
+      this.exams = exams;
     },
-    inputWindowSetup (exams) {
-      let vm = this;
-      vm.exams = vm.arrayShuffle(exams);
-      vm.examWindow = false; vm.inputWindow = true; vm.resultWindow = false;
-      vm.redoAction = "1"; vm.nextAction = "2"
-      vm.redoText = "覚え直す";
-      vm.nextText = "採点";
+    inputWindowSetup () {
+      this.exams = this.arrayShuffle(this.exams);
+      this.examWindow = false; this.inputWindow = true; this.resultWindow = false;
+      this.redoAction = "1"; this.nextAction = "2"
+      this.redoText = "覚え直す";
+      this.nextText = "採点";
     },
     resultWindowSetup () {
-      let vim = this;
-      vm.examWindow = false; vm.inputWindow = false; vm.resultWindow = true;
-      if (!exam.mistake) {
-        vm.redoAction = "1"; vm.nextAction = "3"
+      this.examWindow = false; this.inputWindow = false; this.resultWindow = true;
+      const exams = this.scoring()
+      let miss = exams.find( value => {
+        if ( value.result === "不正解" ) { return true };
+      });
+      if (miss) {
+        this.redoAction = "4"; this.nextAction = "3"
       } else {
-        vm.redoAction = "4"; vm.nextAction = "3"
+        this.redoAction = "1"; this.nextAction = "3"
       }
     },
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ private
     getExam (ret) {
-      let self = this
-        axios.get(`/learn`).then( response => {
-          console.log("getExam");
-          console.log(response.data);
-          ret(response.data)
-          // return response.data
-        }).catch( error => {
-          console.log(error);
-        });
+      axios.get(`/learn`).then( response => {
+        ret(response.data)
+      }).catch( error => {
+        console.log(error);
+      });
     },
     arrayShuffle (array) {
       for(let i = array.length - 1; i > 0; i--){
-        let r = Math.floor(Math.random() * (i + 1));
-        let tmp = array[i];
+        const r = Math.floor(Math.random() * (i + 1));
+        const tmp = array[i];
         array[i] = array[r];
         array[r] = tmp;
       }
       return array
     },
-    mistake () {
-      let self = this;
-      let exams = self.exams;
-      let ary = [];
-      for( let i = 0; i < exams.length; i++ ) {
-        if (!(exams[i].resultB)) {
-          exams[i].result = null;
-          exams[i].input =  null;
-          ary.push(exams[i]);
+    scoring () {
+      console.log("scoring")
+      for( let i = 0; i < this.exams.length; i++ ) {
+        if (this.exams[i].input === this.exams[i].japanese) {
+          this.exams[i].result = "正解";
+          this.exams[i].done = true;
+        } else {
+          this.exams[i].result = "不正解";
+          this.exams[i].done = false;
         };
       };
-      return ary;
+      console.log(this.exams);
+      return this.exams;
     },
     countDown (par, ret) {
-      let self = this;
       let timer;
       const promise = new Promise((resolve, reject) => {
         timer = window.setInterval(() => {
-          var rate = (par -= 2);
-          self.remainingTimeValue = {width: (rate + '%')};
+          const rate = (par -= 2);
+          this.remainingTimeValue = {width: (rate + '%')};
           if (rate <= 0){
             resolve();
           };
