@@ -67,7 +67,7 @@ export default {
         // this.originExams = Object.assign([], exams);
         this.originExams = JSON.parse(JSON.stringify(exams));
         this.examWindowSetup(exams);
-        this.countDown(10, () => {
+        this.countDown(20, () => {
           this.inputWindowSetup(exams);
         });
       });
@@ -76,7 +76,7 @@ export default {
       switch (switchCase) {
         case "1": //覚え直す
         this.examWindowSetup(this.originExams);
-        this.countDown(10, () => {
+        this.countDown(20, () => {
           this.inputWindowSetup(this.originExams);
         });
         break
@@ -88,8 +88,13 @@ export default {
         break;
         case "4": //やり直す
         console.log(switchCase);
-        this.examWindowSetup(this.originExams);
-        this.countDown(10, () => {
+        this.examWindowSetup(
+          this.exams.filter( element => {
+            console.log(element.done)
+            return element.done === false
+          })
+        ); //間違えたものだけ表示
+        this.countDown(20, () => {
           this.inputWindowSetup(this.originExams);
         });
         break;
@@ -99,11 +104,9 @@ export default {
     },
     examWindowSetup (exams) {
       this.examWindow = true; this.inputWindow = false; this.resultWindow = false;
-      // this.exams = Object.assign([], exams); //show originExams
       this.exams = JSON.parse(JSON.stringify(exams))
     },
     inputWindowSetup (exams) {
-      // const examsC = Object.assign([], exams);
       const examsC = JSON.parse(JSON.stringify(exams));
       this.exams = this.arrayShuffle(examsC);
       this.examWindow = false; this.inputWindow = true; this.resultWindow = false;
@@ -113,8 +116,6 @@ export default {
     },
     resultWindowSetup (exams) {
       this.examWindow = false; this.inputWindow = false; this.resultWindow = true;
-      //debug
-      console.log("debug");
       this.exams = this.scoring(exams);
       let miss = this.exams.find( value => {
         if ( value.result === "不正解" ) { return true };
