@@ -83,10 +83,9 @@ export default {
         this.resultWindowSetup(this.exams);
         break
         case "3": // 次の問題
-        console.log(switchCase);
+        this.start();
         break;
         case "4": //やり直す
-        console.log(switchCase);
         this.examWindowSetup(
           this.exams.filter( element => {
             console.log(element.done)
@@ -97,9 +96,10 @@ export default {
           this.inputWindowSetup(this.originExams);
         });
         break;
+        case "5":
+        console.log("chacktest");
+        break;
       }
-    },
-    init () {
     },
     examWindowSetup (exams) {
       this.examWindow = true; this.inputWindow = false; this.resultWindow = false;
@@ -123,12 +123,17 @@ export default {
       if (miss) {
         this.redoText = "やり直す";
         this.messageTitle = "One more challenge!";
-        this.messageBody = "間違えた単語を覚え直して\nもう一度やり直そう!";
+        this.messageBody = "間違えた単語を覚え直して<br>もう一度やり直そう!";
         this.messageStyle = {color: "#00ff00"};
         this.redoAction = "4"; this.nextAction = "3"
+      } else if ( this.wave >= 2) {
+        this.messageTitle = "Congratulations!!";
+        this.messageBody = "しっかりと10個覚えることができましたね！<br>チェックテストへ進もう！";
+        this.messageStyle = {color: "#ff0000"};
+        this.redoAction = "1"; this.nextAction = "5"
       } else {
         this.messageTitle = "Exellent!!";
-        this.messageBody = "しっかりと５個覚えることができましたね！\n次の５問も頑張ろう!";
+        this.messageBody = "しっかりと５個覚えることができましたね！<br>次の５問も頑張ろう!";
         this.messageStyle = {color: "#ff0000"};
         this.redoAction = "1"; this.nextAction = "3"
       }
