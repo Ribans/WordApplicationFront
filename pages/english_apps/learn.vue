@@ -5,197 +5,187 @@
       <option value="english">日本語</option>
       <option value="japanese">英語</option>
     </select>
-    <button v-on:click="start" :disabled="startButton" class="btn">スタート</button>
+    <button v-on:click="start" :disabled="wave >= 1" class="btn">スタート</button>
     <br> <br>
     <div class="progress">
-      <div class="progress-bar progress-bar-danger progress-bar-striped" id="count_down"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="progressRate"> </div>
+      <div class="progress-bar progress-bar-danger progress-bar-striped" id="count_down"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="remainingTimeValue"> </div>
     </div>
+      残り: {{ remainingTimeValue.width }}
     <br>
 
-    <div class="exam" v-if="exam">
-      <h1 v-if="message">{{message}}</h1>
-      <table width="100%">
-        <tr v-if="resultView"><th>問題</th><th>答え</th><th>結果</th><th>入力</th></tr>
-        <tr v-for="exam in exams"> 
-          <td class="question">{{ exam.english }}</td>
-          <td class="answer" v-if="inputForm">{{ exam.japanese }}</td>
-          <td class="answer" v-else>
-            <input type="text" v-model="exam.input" :placeholder="exam.english" class="form-control">
-          </td>
-          <div v-if="resultView">
-            <td>{{ exam.result }}</td>
-            <td>{{ exam.input }}</td>
-          </div>
-        </tr>
-      </table>
-      <!-- <b&#45;table striped :items="exams"></b&#45;table> -->
+    <div class="exam" v-if="examWindow">
+      <div v-for="exam in exams">
+        {{exam.english}} : {{ exam.japanese }}
+      </div>
+    </div>
+
+    <div class="input" v-if="inputWindow">
+      <div v-for="exam in exams">
+        {{exam.english}} : <input type="text" v-model="exam.input" class="form-control">
+      </div>
       <br>
-      <button v-on:click="redo" v-if= "redoButton" class="btn btn-success">覚え直す</button>
-      <button v-on:click="nextStage" v-if= "nextStageButton" class="btn btn-warning">次の5問に進む</button>
-      <button v-on:click="jumpToResult" v-if= "jumpToResultButton" class="btn">回答をチェック</button>
-      <button v-on:click="jumpToChackStage" v-if= "jumpToChackStagekButton" class="btn">チェックテストへ進む</button>
+      <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
+      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning">{{ nextText }}</button>
     </div>
-    <div class="result">
+
+    <div class="result" v-if="resultWindow">
+      <h3 :style="messageStyle" >{{ messageTitle }}</h3>
+      <h4>{{ messageBody }}</h4>
+      <br>
+      <b-table striped hover :items="exams"></b-table>
+      <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
+      <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction === '4' ">{{ nextText }}</button>
     </div>
+
   </div>
 </template>
-<script>
 
-import Vue from 'vue'
+<script>
 import axios from '~/plugins/axios'
 
 export default {
-  data :function() {
+  data () {
     return {
-      title: '覚えるパート',
-      exams: [],
-      inputForm: true,
-      startButton: false,
-      nextButton: false,
-      redoButton: false,
-      jumpToResultButton: false,
-      jumpToChackStagekButton: false,
-      exam: false,
-      resultView: false,
-      message: "",
-      progressRate: {width: "100%"},
+      title: "暗記",
+      messageTitle: "", messageBody: "", messageStyle: {color: "#000"},
+      redoText: "", nextText: "", redoAction: "", nextAction: "",
+      examWindow: false, inputWindow: false, resultWindow: false,
+      exams: [], originExams: [],
       wave: 0,
+      remainingTimeValue: {width: "100%"}
     }
   },
-  methods:{
-    initialization: function(){
-      this.exams = [];
-      this.inputForm = true;
-      this.startButton = false;
-      this.nextStageButton = false;
-      this.redoButton = false,
-      this.jumpToResultButton = false;
-      this.exam = false;
-      this.resultView = false;
-      this.progressRate = {width: "100%"};
-    },
-    getExam: function() {
-      var self = this
-        axios.get(`/learn`).then(function (response) {
-          self.exams = response.data
-        }).catch(function (error) {
-          console.log(error);
+  methods: {
+    start () { //startButton on click program
+      this.wave++;
+      new Promise((resolve, reject) => {
+        this.getExam( exams => {
+          resolve(exams);
         });
+      }).then( exams => {
+        // this.originExams = Object.assign([], exams);
+        this.originExams = JSON.parse(JSON.stringify(exams));
+        this.examWindowSetup(exams);
+        this.countDown(20, () => {
+          this.inputWindowSetup(exams);
+        });
+      });
     },
-    arrayShuffle: function(array){
-      for(var i = array.length - 1; i > 0; i--){
-        var r = Math.floor(Math.random() * (i + 1));
-        var tmp = array[i];
+    button (switchCase) {
+      switch (switchCase) {
+        case "1": //覚え直す
+        this.examWindowSetup(this.originExams);
+        this.countDown(20, () => {
+          this.inputWindowSetup(this.originExams);
+        });
+        break
+        case "2": //採点
+        this.resultWindowSetup(this.exams);
+        break
+        case "3": // 次の問題
+        this.start();
+        break;
+        case "4": //やり直す
+        this.examWindowSetup(
+          this.exams.filter( element => {
+            console.log(element.done)
+            return element.done === false
+          })
+        ); //間違えたものだけ表示
+        this.countDown(20, () => {
+          this.inputWindowSetup(this.originExams);
+        });
+        break;
+        case "5":
+        console.log("chacktest");
+        break;
+      }
+    },
+    examWindowSetup (exams) {
+      this.examWindow = true; this.inputWindow = false; this.resultWindow = false;
+      this.exams = JSON.parse(JSON.stringify(exams))
+    },
+    inputWindowSetup (exams) {
+      const examsC = JSON.parse(JSON.stringify(exams));
+      this.exams = this.arrayShuffle(examsC);
+      this.examWindow = false; this.inputWindow = true; this.resultWindow = false;
+      this.redoAction = "1"; this.nextAction = "2"
+      this.redoText = "覚え直す";
+      this.nextText = "採点";
+    },
+    resultWindowSetup (exams) {
+      this.examWindow = false; this.inputWindow = false; this.resultWindow = true;
+      this.exams = this.scoring(exams);
+      let miss = this.exams.find( value => {
+        if ( value.result === "不正解" ) { return true };
+      });
+      this.nextText = "次へ";
+      if (miss) {
+        this.redoText = "やり直す";
+        this.messageTitle = "One more challenge!";
+        this.messageBody = "間違えた単語を覚え直して<br>もう一度やり直そう!";
+        this.messageStyle = {color: "#00ff00"};
+        this.redoAction = "4"; this.nextAction = "3"
+      } else if ( this.wave >= 2) {
+        this.messageTitle = "Congratulations!!";
+        this.messageBody = "しっかりと10個覚えることができましたね！<br>チェックテストへ進もう！";
+        this.messageStyle = {color: "#ff0000"};
+        this.redoAction = "1"; this.nextAction = "5"
+      } else {
+        this.messageTitle = "Exellent!!";
+        this.messageBody = "しっかりと５個覚えることができましたね！<br>次の５問も頑張ろう!";
+        this.messageStyle = {color: "#ff0000"};
+        this.redoAction = "1"; this.nextAction = "3"
+      }
+    },
+    // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ private
+    getExam (ret) {
+      axios.get(`/learn`).then( response => {
+        ret(response.data)
+      }).catch( error => {
+        console.log(error);
+      });
+    },
+    arrayShuffle (array) {
+      for(let i = array.length - 1; i > 0; i--){
+        const r = Math.floor(Math.random() * (i + 1));
+        const tmp = array[i];
         array[i] = array[r];
         array[r] = tmp;
       }
       return array
     },
-    mistake: function() {
-      var self = this;
-      var exams = self.exams;
-      var ary = [];
-      for( var i = 0; i < exams.length; i++ ){
-        if (!(exams[i].resultB)) {
-          exams[i].result = null;
-          exams[i].input =  null;
-          ary.push(exams[i]);
+    scoring (exams) {
+      for( let i = 0; i < exams.length; i++ ) {
+        if (exams[i].input === exams[i].japanese) {
+          exams[i].result = "正解";
+          exams[i].done = true;
+        } else {
+          exams[i].result = "不正解";
+          exams[i].done = false;
         };
       };
-      return ary;
+      return exams;
     },
-    progress: function() {
-      var self = this;
-      var timer
-      var par = 20
-        var promise = new Promise(function(resolve, reject){
-          timer = window.setInterval(function(){
-            var rate = (par -= 2);
-            self.progressRate = {width: (rate + '%')};
-            if (rate <= 0){
-              resolve();
-            };
-          },1000);
-        })
-        promise.then(function(){
-          clearInterval(timer);
-          self.exams = self.arrayShuffle(self.exams);
-          self.inputForm = false;
-          self.jumpToResultButton = true;
-          self.redoButton = true;
-        })
+    countDown (par, ret) {
+      let timer;
+      const promise = new Promise((resolve, reject) => {
+        timer = window.setInterval(() => {
+          const rate = (par -= 2);
+          this.remainingTimeValue = {width: (rate + '%')};
+          if (rate <= 0){
+            resolve();
+          };
+        },1000);
+      })
+      promise.then(() => {
+        clearInterval(timer);
+        ret(); // return
+      }).catch( e => {
+        alert("Error:" + e)
+      })
     },
-    result: function(){
-      var self = this;
-      self.inputForm = true;
-      self.resultView = true;
-      self.jumpToResultButton = false;
-      self.nextStageButton = true;
-    },
-    jumpToResult: function(){
-      var self = this
-        console.log(self.wave)
-        for (var i = 0; i < self.exams.length; i++ ) {
-          if (self.exams[i].input === self.exams[i].japanese) {
-            // 正解
-            self.exams[i].result = "o";
-            self.exams[i].resultB = true;
-          } else {
-            //不正解
-            self.exams[i].result = "x";
-            self.exams[i].resultB = false;
-          }
-        }
-        self.result()
-    },
-    nextStage: function(){
-      var self = this;
-      self.resultView = false;
-      self.jumpToResultButton = true;
-      self.nextStageButton = false;
-      var exams = self.mistake();
-      if (!(exams[0])) { //間違いがなかった場合
-        if (!(self.wave >= 1)){ //ゲームを終了させるか
-          self.initialization();
-          self.wave++;
-          self.message = "Exellent!!";
-          self.exam = true;
-          self.getExam();
-          self.progress();
-        } else {
-          self.nextButton = false;
-          self.message = "Congratulations!!"
-            self.jumpToResultButton = false;
-          alert("終了！");
-          self.initialization();
-        }
-      } else { //間違いが有った場合
-        self.resultView = false;
-        self.exams = exams;
-        self.inputForm = false;
-      }
-    },
-    redo: function() {
-      var self = this;
-      self.progress();
-      this.inputForm = true;
-      this.startButton = false;
-      this.nextStageButton = false;
-      this.redoButton = false,
-      this.jumpToResultButton = false;
-      this.resultView = false;
-      this.progressRate = {width: "100%"};
-      self.exam = true;
-    },
-    start: function(){
-      var self = this;
-      self.progress();
-      self.initialization();
-      self.wave = 0;
-      self.startButton = true;
-      self.exam = true;
-      self.getExam();
-    }
-  }
+  },
+
 }
 </script>
