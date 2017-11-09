@@ -14,15 +14,12 @@
     <br>
 
     <div class="exam" v-if="examWindow">
-      <h2>exam</h2>
-      <h1 v-if="message">{{message}}</h1>
       <div v-for="exam in exams">
         {{exam.english}} : {{ exam.japanese }}
       </div>
     </div>
 
     <div class="input" v-if="inputWindow">
-      <h2>input</h2>
       <div v-for="exam in exams">
         {{exam.english}} : <input type="text" v-model="exam.input" class="form-control">
       </div>
@@ -32,7 +29,9 @@
     </div>
 
     <div class="result" v-if="resultWindow">
-      <h2>result</h2>
+      <h3 :style="messageStyle" >{{ messageTitle }}</h3>
+      <h4>{{ messageBody }}</h4>
+      <br>
       <b-table striped hover :items="exams"></b-table>
       <button v-on:click="button(redoAction)" v-if= "redoText" class="btn btn-success">{{ redoText }}</button>
       <button v-on:click="button(nextAction)" v-if= "nextText" class="btn btn-warning" :disabled=" redoAction === '4' ">{{ nextText }}</button>
@@ -48,7 +47,7 @@ export default {
   data () {
     return {
       title: "暗記",
-      message: "",
+      messageTitle: "", messageBody: "", messageStyle: {color: "#000"},
       redoText: "", nextText: "", redoAction: "", nextAction: "",
       examWindow: false, inputWindow: false, resultWindow: false,
       exams: [], originExams: [],
@@ -123,8 +122,14 @@ export default {
       this.nextText = "次へ";
       if (miss) {
         this.redoText = "やり直す";
+        this.messageTitle = "One more challenge!";
+        this.messageBody = "間違えた単語を覚え直して\nもう一度やり直そう!";
+        this.messageStyle = {color: "#00ff00"};
         this.redoAction = "4"; this.nextAction = "3"
       } else {
+        this.messageTitle = "Exellent!!";
+        this.messageBody = "しっかりと５個覚えることができましたね！\n次の５問も頑張ろう!";
+        this.messageStyle = {color: "#ff0000"};
         this.redoAction = "1"; this.nextAction = "3"
       }
     },
