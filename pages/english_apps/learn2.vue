@@ -60,14 +60,15 @@ export default {
     start () { //startButton on click program
       this.wave++;
       new Promise((resolve, reject) => {
-        this.getExam( exam => {
-          resolve(exam);
+        this.getExam( exams => {
+          resolve(exams);
         });
-      }).then(exam => {
-        this.originExams = exam;
-          this.examWindowSetup(exam);
+      }).then( exams => {
+        // this.originExams = Object.assign([], exams);
+        this.originExams = JSON.parse(JSON.stringify(exams));
+        this.examWindowSetup(exams);
         this.countDown(10, () => {
-          this.inputWindowSetup();
+          this.inputWindowSetup(exams);
         });
       });
     },
@@ -75,15 +76,22 @@ export default {
       switch (switchCase) {
         case "1": //覚え直す
         this.examWindowSetup(this.originExams);
+        this.countDown(10, () => {
+          this.inputWindowSetup(this.originExams);
+        });
         break
         case "2": //採点
-        this.resultWindowSetup(this.originExams);
+        this.resultWindowSetup(this.exams);
         break
         case "3": // 次の問題
         console.log(switchCase);
         break;
         case "4": //やり直す
         console.log(switchCase);
+        this.examWindowSetup(this.originExams);
+        this.countDown(10, () => {
+          this.inputWindowSetup(this.originExams);
+        });
         break;
       }
     },
@@ -91,23 +99,29 @@ export default {
     },
     examWindowSetup (exams) {
       this.examWindow = true; this.inputWindow = false; this.resultWindow = false;
-      this.exams = exams;
+      // this.exams = Object.assign([], exams); //show originExams
+      this.exams = JSON.parse(JSON.stringify(exams))
     },
-    inputWindowSetup () {
-      this.exams = this.arrayShuffle(this.exams);
+    inputWindowSetup (exams) {
+      // const examsC = Object.assign([], exams);
+      const examsC = JSON.parse(JSON.stringify(exams));
+      this.exams = this.arrayShuffle(examsC);
       this.examWindow = false; this.inputWindow = true; this.resultWindow = false;
       this.redoAction = "1"; this.nextAction = "2"
       this.redoText = "覚え直す";
       this.nextText = "採点";
     },
-    resultWindowSetup () {
+    resultWindowSetup (exams) {
       this.examWindow = false; this.inputWindow = false; this.resultWindow = true;
-      console.log(this.exams);
-      const exams = this.scoring(this.exams);
-      let miss = exams.find( value => {
+      //debug
+      console.log("debug");
+      this.exams = this.scoring(exams);
+      let miss = this.exams.find( value => {
         if ( value.result === "不正解" ) { return true };
       });
+      this.nextText = "次へ";
       if (miss) {
+        this.redoText = "やり直す";
         this.redoAction = "4"; this.nextAction = "3"
       } else {
         this.redoAction = "1"; this.nextAction = "3"
@@ -131,7 +145,6 @@ export default {
       return array
     },
     scoring (exams) {
-      console.log("scoring")
       for( let i = 0; i < exams.length; i++ ) {
         if (exams[i].input === exams[i].japanese) {
           exams[i].result = "正解";
