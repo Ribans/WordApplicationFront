@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     getTankRate (ret) {
-      axios.get(`/tank-rate`).then ( response => {
+      axios.post(`/tank-rate`).then ( response => {
         ret( response.data );
       }).catch( error => {
         console.log(error);
