@@ -26,8 +26,8 @@ express.use(session({
   cookie: {maxAge: 60*60*24*1000 }
 }));
 
-//login
-express.post('/api/login', function(req, res){
+//signin
+express.post('/api/signin', function(req, res){
 
   let postData = JSON.stringify({
     "username": req.body.username,
@@ -73,11 +73,62 @@ express.post('/api/login', function(req, res){
   // res.status(401).json({ error: 'Bad credentials' })
   });
 
+express.post('/api/signup', (req,res) => {
+
+  let postData = JSON.stringify({
+    "username": req.body.username,
+    "password": req.body.password,
+    "confirm_password": req.body.confirmPassword 
+  });
+
+  let options = {
+    host: 'localhost',
+    port: 4567,
+    path: '/sign_up',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': postData.length
+    }
+  };
+
+  const promise = new Promise((resolve, reject) => {
+    console.log("DONE");
+    let req_ = http.request(options, (res) => {
+      console.log('STATUS: ' + res.statusCode);
+      res.setEncoding('utf8');
+      if (res.statusCode == 200) {
+        res.on('data', (chunk) => {
+          resolve(JSON.parse(chunk));
+        });
+      } else {
+        console.log("ERROR");
+        resolve({statusCode: 403});
+      }
+    });
+    req_.on('error', (e) => {
+      console.log('problem with request: ' + e.message);
+    });
+    req_.write(postData);
+    req_.end();
+  });
+
+  promise.then( data => {
+    console.log("then " + data);
+    req.session.currentUser = data;
+    return res.json(data);
+  }).catch( reason => {
+    console.log('Handle rejected promise ('+reason+') here.')
+  });
+
+})
+
 //logout
 express.get('/api/logout', function (req, res) {
   delete req.session.currentUser;
   res.json({ ok: true });
 });
+
 
 
 express.use(nuxt.render);

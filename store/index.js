@@ -21,8 +21,8 @@ const store = () => new Vuex.Store({
         commit('SET_USER', req.session.currentUser)
       }
     },
-    login ({ commit }, { username, password }) {
-      return fetch('/api/login', {
+    signin ({ commit }, { username, password }) {
+      return fetch('/api/signin', {
         // Send the client cookies to the server
         credentials: 'same-origin',
         method: 'POST',
@@ -41,6 +41,28 @@ const store = () => new Vuex.Store({
         }
       }).then(function(currentUser) {
         commit('SET_USER', currentUser);
+      });
+    },
+    signup ({commit}, {username, password, confirmPassword}) {
+      return fetch('/api/signup', {
+        credentials: 'same-origin',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          confirmPassword
+        })
+      }).then( res => {
+        if (res.status === 401) {
+          throw new Error('Bad credentials')
+        } else {
+          return res.json()
+        }
+      }).then( (currentUser) => {
+        commit('SET_USER', currentUser)
       });
     },
     logout ({ commit }) {
