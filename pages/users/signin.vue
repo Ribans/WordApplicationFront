@@ -1,9 +1,15 @@
 <template>
   <div>
     <h1>Signin Page</h1>
-    <div v-if="$store.state.authUser">
-      <h1>Hello {{ $store.state.authUser.username }} </h1>
+
+    <div v-if=" $store.state.currentUser && $store.state.currentUser.statusCode == 403">
+      <p>失敗</p>
     </div>
+    <div v-else>
+      Hello! 
+      {{ $store.state.currentUser.profile.username }}
+    </div>
+
     <label>UserName: 
       <b-form-input v-model="username" type="text" placeholder="Enter your username"></b-form-input> 
     </label>
