@@ -15,8 +15,8 @@
           <b-nav is-nav-bar class="ml-auto">
             <b-nav-item-dropdown right>
               <template slot="button-content"> <strong>User</strong> </template>
-              <div v-if="$store.state.currentUser">
-                <b-dropdown-item href="/">Profile</b-dropdown-item>
+              <div v-if="$store.state.currentUser && !($store.state.currentUser.statusCode == 403) ">
+                <b-dropdown-item href="/users/profile">Profile</b-dropdown-item>
                 <b-dropdown-item href="/logout">Logout</b-dropdown-item>
               </div>
               <div v-else>
