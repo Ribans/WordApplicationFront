@@ -8,17 +8,17 @@ require('whatwg-fetch')
 
 const store = () => new Vuex.Store({
   state: {
-    authUser: null
+    currentUser: null
   },
   mutations: {
     SET_USER: function (state, user) {
-      state.authUser = user
+      state.currentUser = user
     }
   },
   actions: {
     nuxtServerInit ({ commit }, { req }) {
-      if (req.session && req.session.authUser) {
-        commit('SET_USER', req.session.authUser)
+      if (req.session && req.session.currentUser) {
+        commit('SET_USER', req.session.currentUser)
       }
     },
     login ({ commit }, { username, password }) {
@@ -39,8 +39,8 @@ const store = () => new Vuex.Store({
         } else {
           return res.json()
         }
-      }).then(function(authUser) {
-        commit('SET_USER', authUser);
+      }).then(function(currentUser) {
+        commit('SET_USER', currentUser);
       });
     },
     logout ({ commit }) {
