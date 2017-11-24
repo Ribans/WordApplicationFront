@@ -1,9 +1,11 @@
 <template>
   <div>
     <h1>Signin Page</h1>
-    <div v-if="$store.state.authUser">
-      <h1>Hello {{ $store.state.authUser.username }} </h1>
-    </div>
+
+    <b-alert variant="danger" dismissible :show=" $store.state.currentUser && $store.state.currentUser.statusCode == 403" @dismissed="showDismissibleAlert=false">
+      失敗
+    </b-alert>
+
     <label>UserName: 
       <b-form-input v-model="username" type="text" placeholder="Enter your username"></b-form-input> 
     </label>
@@ -27,6 +29,11 @@ export default {
   head: {
     title: 'signin'
   },
+  fetch ({ store, redirect }) {
+    if (store.state.currentUser && !(store.state.currentUser.statusCode == 403) ) {
+      return redirect('/')
+    }
+  },
   data: function() {
     return {
       username: "",
@@ -37,7 +44,7 @@ export default {
   methods: {
     async signin () {
       try {
-        await this.$store.dispatch('login', {
+        await this.$store.dispatch('signin', {
           username: this.username,
           password: this.password
         });

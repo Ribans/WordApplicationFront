@@ -8,21 +8,21 @@ require('whatwg-fetch')
 
 const store = () => new Vuex.Store({
   state: {
-    authUser: null
+    currentUser: null
   },
   mutations: {
     SET_USER: function (state, user) {
-      state.authUser = user
+      state.currentUser = user
     }
   },
   actions: {
     nuxtServerInit ({ commit }, { req }) {
-      if (req.session && req.session.authUser) {
-        commit('SET_USER', req.session.authUser)
+      if (req.session && req.session.currentUser) {
+        commit('SET_USER', req.session.currentUser)
       }
     },
-    login ({ commit }, { username, password }) {
-      return fetch('/api/login', {
+    signin ({ commit }, { username, password }) {
+      return fetch('/api/signin', {
         // Send the client cookies to the server
         credentials: 'same-origin',
         method: 'POST',
@@ -39,8 +39,30 @@ const store = () => new Vuex.Store({
         } else {
           return res.json()
         }
-      }).then(function(authUser) {
-        commit('SET_USER', authUser);
+      }).then(function(currentUser) {
+        commit('SET_USER', currentUser);
+      });
+    },
+    signup ({commit}, {username, password, confirmPassword}) {
+      return fetch('/api/signup', {
+        credentials: 'same-origin',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          confirmPassword
+        })
+      }).then( res => {
+        if (res.status === 401) {
+          throw new Error('Bad credentials')
+        } else {
+          return res.json()
+        }
+      }).then( (currentUser) => {
+        commit('SET_USER', currentUser)
       });
     },
     logout ({ commit }) {
