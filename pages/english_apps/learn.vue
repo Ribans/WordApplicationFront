@@ -50,7 +50,7 @@ export default {
       messageTitle: "", messageBody: "", messageStyle: {color: "#000"},
       redoText: "", nextText: "", redoAction: "", nextAction: "",
       examWindow: false, inputWindow: false, resultWindow: false,
-      exams: [], originExams: [],
+      exams: [], originExams: [], examsAccumulation: [],
       wave: 0,
       remainingTimeValue: {width: "100%"}
     }
@@ -130,15 +130,23 @@ export default {
         this.messageTitle = "Congratulations!!";
         this.messageBody = "しっかりと10個覚えることができましたね！<br>チェックテストへ進もう！";
         this.messageStyle = {color: "#ff0000"};
-        this.redoAction = "1"; this.nextAction = "5"
+        this.redoAction = "1"; this.nextAction = "5";
+        this.learnedExams(exams)
       } else {
         this.messageTitle = "Exellent!!";
         this.messageBody = "しっかりと５個覚えることができましたね！<br>次の５問も頑張ろう!";
         this.messageStyle = {color: "#ff0000"};
-        this.redoAction = "1"; this.nextAction = "3"
+        this.redoAction = "1"; this.nextAction = "3";
+        this.learnedExams(exams)
       }
     },
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ private
+    async learnedExams(exams) {
+      this.examsAccumulation.push(exams)
+      await this.$store.dispatch('learned', {
+        exams: this.examsAccumulation
+      });
+    },
     getExam (ret) {
       axios.get(`/learn`).then( response => {
         ret(response.data)
