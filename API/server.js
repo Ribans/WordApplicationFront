@@ -47,14 +47,12 @@ express.post('/api/signin', function(req, res){
 
   const promise = new Promise((resolve, reject) => {
     let req_ = http.request(options, (res) => {
-      console.log('STATUS: ' + res.statusCode);
       res.setEncoding('utf8');
       if (res.statusCode == 200) {
         res.on('data', (chunk) => {
           resolve(JSON.parse(chunk));
         });
       } else {
-        console.log("ERROR");
         resolve({statusCode: 403});
       }
     });
@@ -66,9 +64,10 @@ express.post('/api/signin', function(req, res){
   });
 
   promise.then( (data) => {
-    console.log("then " + data);
     req.session.currentUser = data;
     return res.json(data);
+  }).catch( () => {
+    res.status(401).json({ error: 'Bad credentials' })
   })
   // res.status(401).json({ error: 'Bad credentials' })
   });
@@ -93,16 +92,13 @@ express.post('/api/signup', (req,res) => {
   };
 
   const promise = new Promise((resolve, reject) => {
-    console.log("DONE");
     let req_ = http.request(options, (res) => {
-      console.log('STATUS: ' + res.statusCode);
       res.setEncoding('utf8');
       if (res.statusCode == 200) {
         res.on('data', (chunk) => {
           resolve(JSON.parse(chunk));
         });
       } else {
-        console.log("ERROR");
         resolve({statusCode: 403});
       }
     });
@@ -114,10 +110,10 @@ express.post('/api/signup', (req,res) => {
   });
 
   promise.then( data => {
-    console.log("then " + data);
     req.session.currentUser = data;
     return res.json(data);
   }).catch( reason => {
+    res.status(401).json({ error: 'Bad credentials' })
     console.log('Handle rejected promise ('+reason+') here.')
   });
 
@@ -129,7 +125,12 @@ express.get('/api/logout', function (req, res) {
   res.json({ ok: true });
 });
 
-
+//learnedExams
+express.post('/api/learned', function(req, res) {
+  console.log(req.body.exams);
+  req.session.learnedExams = req.body.exams;
+  return res.json(req.body.exams);
+})
 
 express.use(nuxt.render);
 express.listen(3333);

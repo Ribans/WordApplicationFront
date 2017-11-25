@@ -8,17 +8,23 @@ require('whatwg-fetch')
 
 const store = () => new Vuex.Store({
   state: {
-    currentUser: null
+    currentUser: null,
+    learnedExams: null
   },
   mutations: {
     SET_USER: function (state, user) {
       state.currentUser = user
+    },
+    SET_LEANED: function (state, exams){
+      console.log("SET: " + exams);
+      state.learnedExams = exams
     }
   },
   actions: {
     nuxtServerInit ({ commit }, { req }) {
       if (req.session && req.session.currentUser) {
         commit('SET_USER', req.session.currentUser)
+        commit('SET_LEANED', req.session.learnedExams)
       }
     },
     signin ({ commit }, { username, password }) {
@@ -73,8 +79,29 @@ const store = () => new Vuex.Store({
       }).then(function() {
         commit('SET_USER', null)
       });
+    },
+    learned ({ commit }, {exams}) {
+      return fetch( '/api/learned', {
+        credentials: 'same-origin',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          exams,
+        })
+      }).then( res => {
+        if (res.status === 401) {
+          throw new Error('Bad credentials')
+        } else {
+          return res.json()
+        }
+      }).then( learnedExams => {
+        commit('SET_LEANED', learnedExams)
+      })
     }
   }
 })
 
 export default store
+
