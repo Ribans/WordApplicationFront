@@ -2,6 +2,7 @@
   <div class="index">
     <h1>MyProfile</h1>
     <span> Hello! {{ username }} </span>
+    {{ $store.state.learnedExams }}
 
     <div class="tank">
 
@@ -49,8 +50,6 @@ export default {
         this.verbRate = {width: Math.floor(tankRate.verb.learned / tankRate.verb.base * 100) + "%"};
         this.nounRate = {width: Math.floor(tankRate.noun.learned / tankRate.noun.base * 100) + "%" };
         this.conjunctionRate = {width: Math.floor(tankRate.conjunction.learned / tankRate.conjunction.base * 100) + "%" };
-      } else {
-        this.login();
       }
     });
   },
