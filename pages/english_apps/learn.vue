@@ -97,7 +97,7 @@ export default {
         });
         break;
         case "5":
-        console.log("chacktest");
+          location.href = '/english_apps/check-test';
         break;
       }
     },
@@ -142,7 +142,7 @@ export default {
     },
     // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ private
     async learnedExams(exams) {
-      this.examsAccumulation.push(exams)
+      this.examsAccumulation.push.apply(this.examsAccumulation, exams)
       await this.$store.dispatch('learned', {
         exams: this.examsAccumulation
       });
