@@ -75,10 +75,18 @@ const store = () => new Vuex.Store({
       return fetch('/api/logout', {
         // Send the client cookies to the server
         credentials: 'same-origin',
-        method: 'POST'
+        method: 'GET'
       }).then(function() {
         commit('SET_USER', null)
       });
+    },
+    clearExams ({commit}) {
+      return fetch('/api/clearExams', {
+        credentials: 'same-origin',
+        method: 'GET'
+      }).then(function() {
+        commit('SET_LEANED', null)
+      })
     },
     learned ({ commit }, {exams}) {
       return fetch( '/api/learned', {
