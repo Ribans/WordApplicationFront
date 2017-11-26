@@ -125,6 +125,11 @@ express.get('/api/logout', function (req, res) {
   res.json({ ok: true });
 });
 
+express.get('/api/clearExams', function( req, res ){
+  delete req.session.learnedExams
+  res.json({ ok: true })
+});
+
 //learnedExams
 express.post('/api/learned', function(req, res) {
   console.log(req.body.exams);
