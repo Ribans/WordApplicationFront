@@ -27,7 +27,7 @@
       <br>
       <strong><span id="count" >残り問題数: {{ 11 - wave }} </span></strong><br>
       <h3 class="exam_title">{{exams[questionLang]}}</h3><br>
-      <button class="btn" v-for=" data in exams.dummies" v-on:click="judgeing(data[answerLang])">{{ data[answerLang] }}</button>
+      <button class="btn" v-for=" data in exams.dummies" v-on:click="judgeing(data[answerLang])" :disabled="examsAnswerShow">{{ data[answerLang] }}</button>
       <ul v-if="examsAnswerShow">
         <li v-for="data in exams.dummies">{{ data[answerLang] }}: {{ data[questionLang] }}</li>
       </ul>
