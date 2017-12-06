@@ -20,7 +20,7 @@
     </div>
     <br>
 
-    <div class="exam">
+    <div class="exam" v-if="examsShow">
       <span class="judge">
         {{ result }}
       </span>
@@ -63,6 +63,7 @@ export default {
       result: "", //回答したあとに出す合否
       answerData: [], //回答されたデータ
       examsAnswerShow: false, //正答例データ
+      examsShow: false,
       resultShow: false,
       wave: 1, //何問解いたかカウント
       progress: {width: "100%"},
@@ -73,6 +74,7 @@ export default {
       if (this.$store.state.currentUser && !(this.$store.state.currentUser.statusCode == 403)) {  
         this.getExam( done => {
           if (done) {
+            this.examsShow = true;
             this.switchLang();
             this.timer();
             //reset
@@ -97,60 +99,57 @@ export default {
     },
     timer: function() {
       var par = 100;
-      var vm = this;
       timer = setInterval(function(){
         if (par >= 0){
-          vm.progress = {width: ((par -= 10) + '%')}
+          this.progress = {width: ((par -= 10) + '%')}
         } else {
-          vm.judgeing("Timeout")
+          this.judgeing("Timeout")
         }
       }, 1000)
     },
     switchLang: function() {
-      var vm = this;
-      switch (vm.selectedLang) {
+      switch (this.selectedLang) {
         case "japanese":
           console.log("Selected: Japanese");
-          vm.questionLang = "english";
-          vm.answerLang = "japanese";
+          this.questionLang = "english";
+          this.answerLang = "japanese";
           break;
         case "english":
           console.log("Selected: English");
-          vm.questionLang = "japanese";
-          vm.answerLang = "english";
+          this.questionLang = "japanese";
+          this.answerLang = "english";
           break;
       }
     },
     judgeing: function(value) {
-      var vm = this;
-      if (vm.exams[vm.answerLang] === value){
+      if (this.exams[this.answerLang] === value){
         console.log("正解");
-        vm.answerData.push({exams: vm.exams, result: "OK", selectAnswer: value})
-        vm.result = "正解"
+        this.answerData.push({exams: this.exams, result: "OK", selectAnswer: value})
+        this.result = "正解"
       } else {
         console.log("不正解");
-        vm.answerData.push({exams: vm.exams, result: "NO", selectAnswer: value})
-        vm.result = "不正解"
+        this.answerData.push({exams: this.exams, result: "NO", selectAnswer: value})
+        this.result = "不正解"
       }
-      vm.next();
+      this.next();
     },
     next: function() {
-      var vm = this;
       clearInterval(timer);
 
-      new Promise(function(resolve ,reject){
-        vm.examsAnswerShow = true;
+      new Promise((resolve ,reject) => {
+        this.examsAnswerShow = true;
         setTimeout(function() { 
           resolve(); 
         }, 3000);
-      }).then(function() {
-        if ( vm.wave < 10 ) {
-          vm.wave += 1;
-          vm.start()
+      }).then(() => {
+        if ( this.wave < 10 ) {
+          this.wave += 1;
+          this.start()
         } else {
-          vm.resultShow = true;
-          vm.exams = [];
-          vm.examsAnswerShow = false;
+          this.resultShow = true;
+          this.exams = [];
+          this.examsShow = false;
+          this.examsAnswerShow = false;
           alert("終了！")
           return false;
         }
