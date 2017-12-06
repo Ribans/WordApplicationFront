@@ -2,6 +2,10 @@
   <div>
     <h2>チャレンジパート</h2>
 
+    <b-alert variant="danger" dismissible :show="!!errorMessage[0]">
+      {{ errorMessage }}
+    </b-alert>
+
     <select id="select-lang" name="lang" class="btn" v-model="selectedLang">
       <option value="japanese">日本語</option>
       <option value="english">英語</option>
@@ -14,6 +18,7 @@
     <div class="progress">
       <div class="progress-bar progress-bar-danger progress-bar-striped" id="count_down"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" :style="progress"> </div>
     </div>
+    <br>
 
     <div class="exam">
       <span class="judge">
@@ -50,6 +55,7 @@ var timer
 export default {
   data: function() {
     return {
+      errorMessage: "",
       exams: [], //試験データ
       selectedLang: "japanese", //選択されている言語
       questionLang: "japanese",
@@ -64,17 +70,29 @@ export default {
   },
   methods: {
     start: function() {
-      this.getExam();
-      this.switchLang();
-      this.timer();
-      //reset
-      this.examsAnswerShow = false,
-      this.result = ""
+      if (this.$store.state.currentUser && !(this.$store.state.currentUser.statusCode == 403)) {  
+        this.getExam( done => {
+          if (done) {
+            this.switchLang();
+            this.timer();
+            //reset
+            this.examsAnswerShow = false,
+            this.result = ""
+          }
+        });
+      } else {
+        this.errorMessage = "ログインしてください"
+      }
     },
-    getExam: function() {
-      var vm = this;
-      axios.get(`/challenge`).then(function(res){
-        vm.exams = res.data
+    getExam: function(done) {
+      axios.post(`/challenge`, JSON.stringify({
+        uid: this.$store.state.currentUser.profile.uid
+      })).then((res) => {
+        this.exams = res.data;
+        done(true);
+      }).catch( e => {
+        this.errorMessage = e.response.data.message;
+        done(false);
       });
     },
     timer: function() {
@@ -121,11 +139,13 @@ export default {
       clearInterval(timer);
 
       new Promise(function(resolve ,reject){
-        setTimeout(function() { resolve(); }, 3000);
+        vm.examsAnswerShow = true;
+        setTimeout(function() { 
+          resolve(); 
+        }, 3000);
       }).then(function() {
         if ( vm.wave < 10 ) {
           vm.wave += 1;
-          vm.examsAnswerShow = true;
           vm.start()
         } else {
           vm.resultShow = true;
