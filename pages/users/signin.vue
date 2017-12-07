@@ -48,15 +48,13 @@ export default {
           username: this.username,
           password: this.password
         });
-        console.log("signin");
         this.username = '';
         this.password = '';
-        if (!this.$store.state.currentUser) {
-          this.formError = "ログインしました";
-        } 
+        this.formError = "Successful login";
       } catch(e) {
         console.log(e);
         this.formError = e.message;
+        this.password = '';
       }
     },
   }
