@@ -2,8 +2,8 @@
   <div>
     <h1>Signin Page</h1>
 
-    <b-alert variant="danger" dismissible :show=" $store.state.currentUser && $store.state.currentUser.statusCode == 403" @dismissed="showDismissibleAlert=false">
-      å¤±æ•—
+    <b-alert variant="danger" dismissible :show="!!formError[0]" @dismissed="showDismissibleAlert=false">
+      {{ formError }}
     </b-alert>
 
     <label>UserName: 
@@ -30,7 +30,7 @@ export default {
     title: 'signin'
   },
   fetch ({ store, redirect }) {
-    if (store.state.currentUser && !(store.state.currentUser.statusCode == 403) ) {
+    if (store.state.currentUser) {
       return redirect('/')
     }
   },
@@ -51,8 +51,11 @@ export default {
         console.log("signin");
         this.username = '';
         this.password = '';
-        this.formError = null;
+        if (!this.$store.state.currentUser) {
+          this.formError = "¥í¥°¥¤¥ó¤·¤Þ¤·¤¿";
+        } 
       } catch(e) {
+        console.log(e);
         this.formError = e.message;
       }
     },

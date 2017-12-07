@@ -39,13 +39,16 @@ const store = () => new Vuex.Store({
           username,
           password
         })
-      }).then(function(res){
-        if (res.status === 401) {
-          throw new Error('Bad credentials')
-        } else {
-          return res.json()
+      }).then( res => {
+        switch (res.status) {
+          case 400:
+            throw new Error('BatReqest')
+            break;
+          default:
+            return res.json()
+            break;
         }
-      }).then(function(currentUser) {
+      }).then(currentUser => {
         commit('SET_USER', currentUser);
       });
     },
@@ -62,10 +65,13 @@ const store = () => new Vuex.Store({
           confirmPassword
         })
       }).then( res => {
-        if (res.status === 401) {
-          throw new Error('Bad credentials')
-        } else {
-          return res.json()
+        switch (res.status) {
+          case 400:
+            throw new Error('BatReqest')
+            break;
+          default:
+            return res.json()
+            break;
         }
       }).then( (currentUser) => {
         commit('SET_USER', currentUser)

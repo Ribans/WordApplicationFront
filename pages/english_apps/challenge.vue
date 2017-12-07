@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     start: function() {
-      if (this.$store.state.currentUser && !(this.$store.state.currentUser.statusCode == 403)) {  
+      if (this.$store.state.currentUser) {  
         this.getExam( done => {
           if (done) {
             this.examsShow = true;

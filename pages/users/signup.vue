@@ -35,7 +35,7 @@ export default {
     title: 'signup'
   },
   fetch ({ store, redirect }) {
-    if (store.state.currentUser && !(store.state.currentUser.statusCode == 403) ) {
+    if (store.state.currentUser ) {
       return redirect('/')
     }
   },
@@ -58,7 +58,9 @@ export default {
         this.username = '';
         this.password = '';
         this.confirmPassword = '';
-        this.formError = null;
+        if (!this.$store.state.currentUser) {
+          this.formError = "ログインしました";
+        } 
       } catch(e) {
         this.formError = e.message;
       }

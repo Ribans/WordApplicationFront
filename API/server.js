@@ -53,7 +53,7 @@ express.post('/api/signin', function(req, res){
           resolve(JSON.parse(chunk));
         });
       } else {
-        resolve({statusCode: 403});
+        reject("BatReqest")
       }
     });
     req_.on('error', (e) => {
@@ -67,7 +67,7 @@ express.post('/api/signin', function(req, res){
     req.session.currentUser = data;
     return res.json(data);
   }).catch( () => {
-    res.status(401).json({ error: 'Bad credentials' })
+    res.status(400).json({ error: 'Bad credentials' })
   })
   // res.status(401).json({ error: 'Bad credentials' })
   });

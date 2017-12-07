@@ -56,7 +56,7 @@ export default {
       this.result = ""
       },
     getExam: function() {
-      if (this.$store.state.currentUser && !(this.$store.state.currentUser.statusCode == 403)) {  
+      if (this.$store.state.currentUser) {  
         axios.post(`/training`, JSON.stringify({
           uid: this.$store.state.currentUser.profile.uid
         })).then((res) => {

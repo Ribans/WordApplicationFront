@@ -2,7 +2,6 @@
   <div class="index">
     <h1>MyProfile</h1>
     <span> Hello! {{ username }} </span>
-    {{ $store.state.learnedExams }}
 
     <div class="tank">
 
