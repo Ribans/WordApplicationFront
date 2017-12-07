@@ -99,7 +99,7 @@ export default {
     },
     timer: function() {
       var par = 100;
-      timer = setInterval(function(){
+      timer = setInterval(() => {
         if (par >= 0){
           this.progress = {width: ((par -= 10) + '%')}
         } else {
