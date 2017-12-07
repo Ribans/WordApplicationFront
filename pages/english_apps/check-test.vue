@@ -70,17 +70,21 @@ export default {
       this.next();
     },
     remembered (word_id) {
-      axios.post(`/remembered`, JSON.stringify({
-        uid: this.$store.state.currentUser.profile.uid,
-        word_id: word_id
-      })).then((res) => {
-        if (res.status === 200) {
-          console.log("Ankimoタンクに蓄積されました");
-        }
-      }).catch( (e) => {
-        console.log(e.response.data.message)
-        console.log("Ankimoタンクから蓄積を試みましたが失敗しました");
-      });
+      if (this.$store.state.currentUser) {
+        axios.post(`/remembered`, JSON.stringify({
+          uid: this.$store.state.currentUser.profile.uid,
+          word_id: word_id
+        })).then((res) => {
+          if (res.status === 200) {
+            console.log("Ankimoタンクに蓄積されました");
+          }
+        }).catch( (e) => {
+          console.log(e.response.data.message)
+          console.log("Ankimoタンクから蓄積を試みましたが失敗しました");
+        });
+      } else {
+        console.log("ログインしていないため蓄積されませんでした")
+      }
     },
     next: function() {
       new Promise((resolve ,reject) => {
